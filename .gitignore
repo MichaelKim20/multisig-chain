@@ -1,0 +1,10 @@
+# WebStorm
+.idea/
+
+chain/side-chain/chain/
+chain/main-chain/chain/
+chain/boa-scan/logs/
+chain/boa-scan/redis-data/
+db/
+
+.hidden.env

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if docker compose ls | grep -q 'boa-scan'
+then
+  ./chain/cmd.sh stop-boa-scan
+fi
+
+if docker compose ls | grep -q 'postgres'
+then
+  ./chain/cmd.sh stop-db
+fi
+
+if docker compose ls | grep -q 'side-chain'
+then
+  ./chain/cmd.sh stop-side-chain
+fi
+
+if docker compose ls | grep -q 'main-chain'
+then
+  ./chain/cmd.sh stop-main-chain
+fi
+
+if docker network ls | grep -q 'bosagora_network'
+then
+  ./chain/cmd.sh remove-network
+fi

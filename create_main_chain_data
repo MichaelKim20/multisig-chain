@@ -1,0 +1,76 @@
+#!/bin/bash
+
+if ! docker network ls | grep -q 'bosagora_network'
+then
+  docker network create --subnet=172.200.0.0/16 bosagora_network
+  sleep 2
+fi
+
+if docker compose ls | grep -q 'boa-scan'
+then
+  ./chain/cmd.sh stop-boa-scan
+  sleep 2
+fi
+
+if docker compose ls | grep -q 'postgres'
+then
+  ./chain/cmd.sh stop-db
+  sleep 2
+fi
+
+if docker compose ls | grep -q 'side-chain'
+then
+  ./chain/cmd.sh stop-side-chain
+  sleep 2
+fi
+
+if docker compose ls | grep -q 'main-chain'
+then
+  ./chain/cmd.sh stop-main-chain
+  sleep 2
+fi
+
+./chain/cmd.sh clear-main-chain
+
+sleep 10
+
+./chain/cmd.sh start-main-chain
+
+sleep 10
+
+CURRENT_POS="$(pwd)"
+
+ECHO "Multi-Signature Wallet Contracts"
+
+cd submodules/multisig-wallet
+yarn install --pure-lockfile
+cd packages/contracts
+cp -f env/.env.sample env/.env
+rm -rf .openzeppelin
+yarn clean
+yarn build
+yarn deploy:main_chain_devnet
+
+cd "$CURRENT_POS"
+
+ECHO "ACC Token Contracts"
+
+cd submodules/dms-token-contracts
+yarn install --pure-lockfile
+cp -f env/.env.sample env/.env
+rm -rf .openzeppelin
+yarn clean
+yarn build
+yarn deploy:main_chain_devnet
+
+cd "$CURRENT_POS"
+
+sleep 10
+
+./stop
+
+cd chain/main-chain
+sudo rm chain.zip
+sudo zip -r chain.zip chain/*
+
+cd "$CURRENT_POS"

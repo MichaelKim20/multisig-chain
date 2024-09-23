@@ -1,0 +1,53 @@
+#!/bin/bash
+
+if ! docker network ls | grep -q 'bosagora_network'
+then
+  docker network create --subnet=172.200.0.0/16 bosagora_network
+  sleep 2
+fi
+
+if docker compose ls | grep -q 'boa-scan'
+then
+  ./chain/cmd.sh stop-boa-scan
+  sleep 2
+fi
+
+if docker compose ls | grep -q 'postgres'
+then
+  ./chain/cmd.sh stop-db
+  sleep 2
+fi
+
+if docker compose ls | grep -q 'side-chain'
+then
+  ./chain/cmd.sh stop-side-chain
+  sleep 2
+fi
+
+if docker compose ls | grep -q 'main-chain'
+then
+  ./chain/cmd.sh stop-main-chain
+fi
+
+./chain/cmd.sh clear-side-chain
+
+./chain/cmd.sh start-side-chain
+
+sleep 5
+
+./chain/cmd.sh clear-main-chain
+
+./chain/cmd.sh start-main-chain
+
+sleep 10
+
+./chain/cmd.sh start-db
+
+sleep 5
+
+./chain/cmd.sh init-db
+
+sleep 10
+
+./chain/cmd.sh start-boa-scan
+

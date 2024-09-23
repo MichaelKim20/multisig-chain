@@ -1,0 +1,6 @@
+[submodule "submodules/dms-token-contracts"]
+	path = submodules/dms-token-contracts
+	url = https://github.com/bosagora/dms-token-contracts.git
+[submodule "submodules/multisig-wallet"]
+	path = submodules/multisig-wallet
+	url = https://github.com/bosagora/multisig-wallet.git
